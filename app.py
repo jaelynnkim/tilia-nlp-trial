@@ -2,10 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 import re
-from transformers import pipeline
+from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration
 import nltk
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import pos_tag
 
 nltk.download('punkt')
@@ -21,6 +20,7 @@ def extract_details_from_filename(filename):
     year = year_match.group()[:-4] if year_match else '0000'
     return company, quarter, int(year)
 
+@st.cache
 def load_texts_to_dataframe(file_list):
     data = []
     for uploaded_file in file_list:
