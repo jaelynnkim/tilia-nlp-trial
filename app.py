@@ -8,8 +8,8 @@ from transformers import pipeline
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+# Set NLTK data path to the local directory
+nltk.data.path.append('./nltk_data')
 
 # Helper functions
 def extract_details_from_filename(filename):
@@ -140,4 +140,3 @@ if uploaded_files:
             st.dataframe(filtered_df)
 else:
     st.write("No files uploaded.")
-
