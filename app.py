@@ -101,6 +101,10 @@ if uploaded_files:
     
     originaltxt = load_texts_to_dataframe(uploaded_files)
 
+    if 'Text' not in originaltxt.columns:
+        st.error("Error: 'Text' column not found in the loaded DataFrame.")
+        st.stop()
+
     st.write("Original DataFrame")
     st.dataframe(originaltxt)
 
@@ -146,6 +150,13 @@ if uploaded_files:
     tokenizer = T5Tokenizer.from_pretrained(model_id)
     model = T5ForConditionalGeneration.from_pretrained(model_id)
     compression_pipeline = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
+
+    def remove_first_last_three(df):
+        # If the group has fewer than seven rows, return an empty DataFrame
+        if len(df) <= 6:
+            return pd.DataFrame()
+        # Otherwise, return the DataFrame excluding the first three and last three rows
+        return df.iloc[3:-3]
 
     filtered_df = sentence_df.groupby(['Company', 'Year', 'Quarter']).apply(remove_first_last_three).reset_index(drop=True)
     filtered_df['Compressed_Sentence'] = filtered_df['Sentence'].apply(lambda x: compress_sentence(x, compression_pipeline))
