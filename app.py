@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 import re
 from transformers import pipeline, T5Tokenizer, T5ForConditionalGeneration
 import nltk
@@ -94,9 +93,12 @@ def extract_nouns(sentence):
 # Streamlit App
 st.title("Document Upload and Processing App")
 
-uploaded_files = st.file_uploader("Upload your documents", accept_multiple_files=True, type=['txt', 'pdf', 'docx'])
+uploaded_files = st.file_uploader("Upload your documents", accept_multiple_files=True, type=['txt'])
 
 if uploaded_files:
+    st.write("Processing uploaded files... This may take some time.")
+    progress_bar = st.progress(0)
+    
     originaltxt = load_texts_to_dataframe(uploaded_files)
 
     st.write("Original DataFrame")
@@ -115,6 +117,8 @@ if uploaded_files:
     fix_df['Text'] = fix_df['Text'].apply(remove_text_before_presentation)
     cleantext = fix_df.copy()
     sentence_df = split_into_sentences(cleantext, 'Text')
+
+    progress_bar.progress(30)
 
     # Load summarization pipeline
     summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
@@ -135,6 +139,8 @@ if uploaded_files:
     summary_df10 = pd.DataFrame(rows)
     sentence_df = split_into_sentences(summary_df10, 'pipeline_summary')
 
+    progress_bar.progress(60)
+
     # Load compression pipeline
     model_id = "jaelynnkk/sentence_compression"
     tokenizer = T5Tokenizer.from_pretrained(model_id)
@@ -150,10 +156,14 @@ if uploaded_files:
     unique_keywords = filtered_keywords_seq['Nouns_Only'].unique()
     selected_keyword = st.selectbox('Select a Keyword', unique_keywords)
 
+    progress_bar.progress(90)
+
     if selected_keyword:
         st.write(f"Selected Keyword: {selected_keyword}")
         keyword_df = filtered_keywords_seq[filtered_keywords_seq['Nouns_Only'] == selected_keyword]
         st.write(keyword_df[['Company', 'Year', 'Quarter', 'Compressed_Sentence']])
+
+    progress_bar.progress(100)
 
     if st.button('Clear All Files'):
         uploaded_files = None
