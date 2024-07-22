@@ -1,3 +1,6 @@
 streamlit
-pymupdf
-python-docx
+pandas
+nltk
+transformers
+torch
+sentencepiece
