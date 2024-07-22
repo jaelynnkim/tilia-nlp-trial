@@ -28,7 +28,7 @@ def main():
     uploaded_files = st.file_uploader("Choose PDF or Word files", type=['pdf', 'docx'], accept_multiple_files=True)
 
     if uploaded_files:
-        for uploaded_file in uploaded_files:
+        for idx, uploaded_file in enumerate(uploaded_files):
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                 temp_file.write(uploaded_file.read())
                 temp_filename = temp_file.name
@@ -40,7 +40,7 @@ def main():
                 st.write(f"**Processing Word file:** {uploaded_file.name}")
                 text = read_word(temp_filename)
             
-            st.text_area(f"Content of {uploaded_file.name}:", text, height=200)
+            st.text_area(f"Content of {uploaded_file.name}:", text, height=200, key=f"text_area_{idx}")
             os.remove(temp_filename)
 
 if __name__ == "__main__":
