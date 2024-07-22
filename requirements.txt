@@ -4,3 +4,4 @@ nltk
 transformers
 torch
 sentencepiece
+requests
